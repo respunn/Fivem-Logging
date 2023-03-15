@@ -2,7 +2,7 @@
 One file python discord bot.
 
 
-You can use log players without admin panel or authorization. (You can use this Log only if the files are not hidden!)<br>
+You can use log players without admin panel or authorization. (You can use this Log only if the files are not from server-side hidden!)<br>
 You can use race command to calculate post-race fares.<br>
 (1st: %60, 2nd: %30, 3rd: %10, but 3rd one gets minimum entrance_fee.)
 
