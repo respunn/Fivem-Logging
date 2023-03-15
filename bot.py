@@ -191,7 +191,7 @@ async def s(ctx):
 async def clear(ctx, amount: int):
     await ctx.channel.purge(limit=amount+1)
 
-
+#You can add character names here, works with discord id.
 def CharacterNames(character):
     if character.id == 123456789123456789:
         name = "Player 1"
