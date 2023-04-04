@@ -239,12 +239,6 @@ async def s(ctx):
         print(e) #Printing error.
 
 
-#In addition, the !clear command works with purge.
-@bot.command()
-async def clear(ctx, amount: int):
-    await ctx.channel.purge(limit=amount+1)
-
-
 #You can set character names to discord mentions.
 def CharacterNames(character):
     if character.id == 123456789123456789:
