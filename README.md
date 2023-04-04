@@ -20,9 +20,10 @@ Before you can use this bot, you need to make sure you have the following:
 
 `TOKEN = 'your_discord_bot_token'`
 
-5. Open the script file and update the `server_ip` and `port` variables with the IP address and port number of your game server.
-6. In your Discord server, create a new bot application and invite it to your server with the appropriate permissions.
-7. Start the bot by running the script in your terminal: `python bot.py`.
+5. Open the config file and update the `server_ip` and `port` variables with the IP address and port number of your game server.
+6. You can add admin's discord ids to players/log_admin_ids file.
+7. In your Discord server, create a new bot application and invite it to your server with the appropriate permissions.
+8. Start the bot by running the script in your terminal: `python bot.py`.
 
 ## Usage
 
@@ -40,4 +41,4 @@ The `route` parameter determines which race is being run, and `number_of_racers`
 - `!changecounter [new_counter]`: Changes the race counter to a new value.
 - `!checkcounter`: Displays the current value of the race counter.
 
-These functions allow the bot to save and retrieve a counter value from a text file. This counter value is used to keep track of the race number for each race run by the bot.
+These functions allow the bot to save and retrieve a counter value from a text file. This counter value is used to keep track of the race number for each race run by the bot. You can change discord members name's to whatever you want from players/racers_names file.
