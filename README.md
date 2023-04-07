@@ -29,7 +29,7 @@ Before you can use this bot, you need to make sure you have the following:
 
 Once the bot is running, you can use the following commands in your Discord server:
 
-- `!g`: This command will log the player count in your game server and update the channel every second with any changes in the player count (players joining or leaving the server).
+- **Logging:** It will start logging immediately after running the bot, you can change which channel bot need to send messages to from config file. 
 - `!p`: This command will display a list of players in your game server, along with their Discord mentions and in-game IDs. You can also use this command to check the number of admins and potential PD (police department) players on the server.
 - `!s`: This command will display a list of resources running on your game server, along with any new resources that have been added or deleted since the last time the command was used. The list is saved to a text file for future reference.
 
