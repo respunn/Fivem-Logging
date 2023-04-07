@@ -6,10 +6,24 @@ from important_files.config import *
 # If you want to check is there any admins, you can use their discord id with it.
 from players.log_admin_ids import *
 
+def connection():
+        try:
+            response = requests.get(serverurl).json()
+            # If the JSON file can be accessed, return the data.
+            return response
+        except requests.exceptions.RequestException as e:
+            print(e) # Printing error.
+            return
+
 class log_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.is_running = True
         self.last_error_time = 0
+        self.is_connected = False
+        self.old_list_from_outside = []
+        self.did_it_work_check = True
+        self.logging_players.start()
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -17,15 +31,77 @@ class log_commands(commands.Cog):
     
     @tasks.loop(seconds=1)
     async def logging_players(self):
-        # Attempt to connect to a link
-        success = await connect_to_link()
-        
-        # If connection fails and 60 seconds have elapsed since last error message
-        if not success and time.time() - self.last_error_time >= 60:
-            # Send error message
-            channel = self.bot.get_channel(1234567890) # Replace with your channel ID
-            await channel.send("Failed to connect to link.")
-            self.last_error_time = time.time() # Update last error time
+        if self.is_running:
+            channel = self.bot.get_channel(channelid)
+            
+            current_GMT = time.gmtime()
+            ts = calendar.timegm(current_GMT)
+            
+            embedok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(0,255,0))
+            embedok.add_field(name="JSON file reached, logging.", value=f"<t:{ts}:F>", inline=False)
+            embednotok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(255,0,0))
+            embednotok.add_field(name="Unable to reach JSON file.", value=f"<t:{ts}:F>", inline=False)
+            
+            # Attempt to connect to a link
+            response = await connection()
+            
+            # Reset the old and new lists at the start of each iteration of the loop
+            old_list = self.old_list_from_outside.copy()
+            new_list = []
+            
+            # If connection fails and 60 seconds have elapsed since last error message
+            if not response and time.time() - self.last_error_time >= 60:
+                # Send error message
+                await channel.send(embed=embednotok)
+                self.last_error_time = time.time() # Update last error time
+                self.is_connected = False
+            else:
+                if not self.is_connected:
+                    # Send "JSON file reached" message only once when the connection is established
+                    self.is_connected = True
+                    await channel.send(embed=embedok)
+                
+                if self.did_it_work_check == True:
+                    # Appending players to old_list first.
+                    for player in response:
+                        for identifier in player['identifiers']:
+                            if identifier in separated:
+                                # Append the name associated with the identifier to the old_list
+                                old_list.append(separated[identifier])
+                                break  # Skip the rest of the identifiers for this player
+                            else:
+                                old_list.append(f"{player['name']}")
+                    self.did_it_work_check = False
+                else:
+                    # Appending players to new_list.
+                    for player in response:
+                        for identifier in player['identifiers']:
+                            if identifier in separated:
+                                # Append the name associated with the identifier to the new_list
+                                new_list.append(separated[identifier])
+                                break  # Skip the rest of the identifiers for this player
+                            else:
+                                new_list.append(f"{player['name']}")
+                    
+                    # Compare lists and assigning to new lists.
+                    old_set = set(old_list)
+                    new_set = set(new_list)
+                    deleted_players = old_set - new_set
+                    added_players = new_set - old_set
+                    
+                    # Adding data to embed.
+                    for player in deleted_players:
+                        embed=discord.Embed(color=discord.Color.from_rgb(255,0,0))
+                        embed.add_field(name=f"{player} left the server.", value=f"<t:{ts}:F>", inline=False)
+                        await channel.send(embed=embed)
+                    
+                    for player in added_players:
+                        embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
+                        embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
+                        await channel.send(embed=embed)
+                    
+                    # After adding datas to embed, assign the new list to the old list.
+                    self.old_list_from_outside = new_list.copy()
     
     @logging_players.before_loop
     async def before_my_task(self):
@@ -33,8 +109,17 @@ class log_commands(commands.Cog):
     
     @logging_players.after_loop
     async def after_my_task(self):
-        channel = self.bot.get_channel(channelid) # Replace with your channel ID
-        await channel.send("The log loop is broken.")
+        channel = self.bot.get_channel(channelid)
+        embed=discord.Embed(title="", color=discord.Color.from_rgb(255,0,0))
+        embed.set_author(name="The log loop is broken.")
+        await channel.send(embed)
+    
+    @commands.command()
+    async def stoplog(self, ctx):
+        self.is_running = False
+        embed=discord.Embed(title="", color=discord.Color.from_rgb(255,165,0))
+        embed.set_author(name="Logging has been stopped.")
+        await ctx.send(embed)
     
     # !p command that shows how many players there are.
     @commands.command()

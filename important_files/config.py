@@ -5,3 +5,9 @@ serverurl = f"http://{server_ip}:{port}/players.json" #YOU DON'T NEED TO TOUCH T
 
 # Assigning the channel for sending log messages.
 channelid = 123456789123456789
+
+# Separated player identifiers and their associated names
+separated = {
+    "steam:123456789123456": "Separated Player 1",
+    "steam:123456789123456": "Separated Player 2"
+}
