@@ -104,11 +104,11 @@ class log_commands(commands.Cog):
                     self.old_list_from_outside = new_list.copy()
     
     @logging_players.before_loop
-    async def before_my_task(self):
+    async def before_logging_players(self):
         await self.bot.wait_until_ready()
     
     @logging_players.after_loop
-    async def after_my_task(self):
+    async def after_logging_players(self):
         channel = self.bot.get_channel(channelid)
         embed=discord.Embed(title="", color=discord.Color.from_rgb(255,0,0))
         embed.set_author(name="The log loop is broken.")
