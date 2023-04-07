@@ -9,92 +9,32 @@ from players.log_admin_ids import *
 class log_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.last_error_time = 0
     
     @commands.Cog.listener()
-    async def on_ready(self, ctx):
+    async def on_ready(self):
         print('Log commands cog is ready.')
+    
+    @tasks.loop(seconds=1)
+    async def logging_players(self):
+        # Attempt to connect to a link
+        success = await connect_to_link()
         
-        print('Logging has started.')
-        did_it_work_check = True
-        request_check = True
-        
-        # We need to create old_list outside of loop.
-        old_list = []
-        
-        # Creating embeds.
-        embedok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(0,255,0))
-        embednotok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(255,0,0))
-        embedok.set_author(name="JSON file reached, logging.")
-        embednotok.set_author(name="Unable to reach JSON file, stopping log.")
-        
-        # Trying to access JSON file.
-        try:
-            response = requests.get(serverurl).json()
-            # If the JSON file can be accessed, continue the code and post embed.
-            await ctx.send(embed=embedok)
-        except requests.exceptions.RequestException as e:
-            print(e) # Printing error.
-            
-            # If the JSON file cannot be accessed, break the code and post embed.
-            await ctx.send(embed=embednotok)
-            request_check = False # Using variable here to check is there any issue for going inside of a loop.
-        
-        while request_check == True:
-            # Assinging time every loop.
-            current_GMT = time.gmtime()
-            ts = calendar.timegm(current_GMT)
-            
-            # Trying to access JSON file every loop.
-            try:
-                response = requests.get(serverurl).json()
-            except:
-                await ctx.send(embed=embednotok)
-                # If the JSON file cannot be accessed, break the code and post embed.
-                break
-            
-            if did_it_work_check == True:
-                # Appending players to new_list.
-                for player in response:
-                    # If you want to seperate some player from others and count them you can use this.
-                    if "steam:123456789123456" in player['identifiers']:
-                        old_list.append("SeperatedPlayer")
-                    else:
-                        old_list.append(f"{player['name']}")
-                did_it_work_check = False
-            else:
-                # Creating new_list for to compare old_list.
-                new_list = []
-                
-                # Appending players to new_list.
-                for player in response:
-                    #If you want to seperate some player from others and count them you can use this.
-                    if "steam:123456789123456" in player['identifiers']:
-                        new_list.append("SeperatedPlayer")
-                    else:
-                        new_list.append(f"{player['name']}")
-                
-                # Compare lists and assigning to new lists.
-                old_set = set(old_list)
-                new_set = set(new_list)
-                deleted_players = old_set - new_set
-                added_players = new_set - old_set
-                
-                # Adding data to embed.
-                for player in deleted_players:
-                    embed=discord.Embed(color=discord.Color.from_rgb(255,0,0))
-                    embed.add_field(name=f"{player} left the server.", value=f"<t:{ts}:F>", inline=False)
-                    await ctx.send(embed=embed)
-                
-                for player in added_players:
-                    embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
-                    embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
-                    await ctx.send(embed=embed)
-                
-                # After adding datas to embed, assign the new list to the old list.
-                old_list = new_list
-            
-            # Waiting 1 second for new loop.
-            await asyncio.sleep(1)
+        # If connection fails and 60 seconds have elapsed since last error message
+        if not success and time.time() - self.last_error_time >= 60:
+            # Send error message
+            channel = self.bot.get_channel(1234567890) # Replace with your channel ID
+            await channel.send("Failed to connect to link.")
+            self.last_error_time = time.time() # Update last error time
+    
+    @logging_players.before_loop
+    async def before_my_task(self):
+        await self.bot.wait_until_ready()
+    
+    @logging_players.after_loop
+    async def after_my_task(self):
+        channel = self.bot.get_channel(channelid) # Replace with your channel ID
+        await channel.send("The log loop is broken.")
     
     # !p command that shows how many players there are.
     @commands.command()

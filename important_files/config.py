@@ -2,3 +2,6 @@
 server_ip = "play.server.net"
 port = "30120"
 serverurl = f"http://{server_ip}:{port}/players.json" #YOU DON'T NEED TO TOUCH THIS.
+
+# Assigning the channel for sending log messages.
+channelid = 123456789123456789
