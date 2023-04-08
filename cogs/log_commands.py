@@ -33,7 +33,7 @@ class log_commands(commands.Cog):
             embednotok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(255,0,0))
             embednotok.add_field(name="Unable to reach JSON file.", value=f"<t:{ts}:F>", inline=False)
             
-            # Attempt to connect to a link
+            # Attempt to connect to a json file
             try:
                 response = requests.get(serverurl).json()
                 # If the JSON file can be accessed, return the data.
@@ -137,50 +137,44 @@ class log_commands(commands.Cog):
     # !p command that shows how many players there are.
     @commands.command()
     async def p(self, ctx):
+        # Attempt to connect to a json file
         try:
-            # Attempt to connect to a link
-            try:
-                response = requests.get(serverurl).json()
-                # If the JSON file can be accessed, return the data.
-            except requests.exceptions.RequestException as e:
-                print(e) # Printing error.
-            
-            total_players = len(response)
-            
-            admincount = 0
-            potentialpdcount = 0
-            discord_id = None
-            embed=discord.Embed(title="X Server's Playerlist", color=discord.Color.from_rgb(255,255,255))
-            for player in response:
-                # Getting player name.
-                identifier = player['identifiers']
-                
-                # You can add custom names to specific discord ids.
-                if "steam:123456789123456" in identifier:
-                    playername = "Admin Name"
-                    admincount += 1
-                else:
-                    playername = player['name']
-                
-                #After getting player name, adding discord mention and in game id to embed.
-                for identifier in player['identifiers']:
-                    if identifier.startswith('discord:'):
-                        discord_id = identifier[8:]
-                        if discord_id in admins_discord_ids:
-                            embed.add_field(name=f"{playername} - #{player['id']}", value=f"<@{discord_id}>", inline=True)
-                        else:
-                            embed.add_field(name=f"{playername} - #{player['id']}", value=f"<@{discord_id}>", inline=True)
-            
-            # This is for alignment.
-            if total_players%3 > .5:
-                embed.add_field(name="", value="", inline=True)
-            
-            # Adding datas to footer and printing it to discord.
-            embed.set_footer(text=f"Total players: {str(total_players)}   |   Potential PD count: {str(potentialpdcount)}   |   There are {str(admincount)} admins on the server!")
-            await ctx.send(embed=embed)
-            
+            # If the JSON file can be accessed, return the data.
+            response = requests.get(serverurl).json()
+            # Sorting json data by the "id" key in ascending order.
+            response = sorted(response, key=lambda k: k['id'])
         except requests.exceptions.RequestException as e:
             print(e) # Printing error.
+        
+        total_players = len(response)
+        admincount = 0
+        potentialpdcount = 0
+        discord_id = None
+        
+        embed=discord.Embed(title="X Server's Playerlist", color=discord.Color.from_rgb(255,255,255))
+        
+        for player in response:
+            for identifier in player['identifiers']:
+                if identifier.startswith('discord:'):
+                    discord_id = identifier[8:]
+            
+            if discord_id in admins:
+                embed.add_field(name=f"{player['name']} - #{player['id']}", value=f"<@{discord_id}>\nᴀᴅᴍɪɴ", inline=True)
+                admincount += 1
+            elif discord_id in potential_pd:
+                embed.add_field(name=f"{player['name']} - #{player['id']}", value=f"<@{discord_id}>\nᴘᴏᴛᴇɴᴛɪᴀʟ ᴘᴅ", inline=True)
+                potentialpdcount += 1
+            else:
+                embed.add_field(name=f"{player['name']} - #{player['id']}", value=f"<@{discord_id}>", inline=True)
+        
+        # This is for alignment.
+        if total_players%3 > .5:
+            embed.add_field(name="", value="", inline=True)
+        
+        # Adding datas to footer and sending it to discord.
+        embed.set_footer(text=f"Total players: {str(total_players)}   |   Potential PD count: {str(potentialpdcount)}   |   There are {str(admincount)} admins on the server!")
+        await ctx.send(embed=embed)
+
 
     # You can check the resources with the !s command.
     @commands.command()
@@ -193,7 +187,7 @@ class log_commands(commands.Cog):
         deleted_scripts_string = ""
         
         try:
-            # Attempt to connect to a link
+            # Attempt to connect to a json file
             try:
                 response = requests.get(serverurl).json()
                 # If the JSON file can be accessed, return the data.
