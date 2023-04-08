@@ -2,8 +2,8 @@
 #You need to add your server ip and port.
 server_ip = "134.255.225.3"
 port = "30120"
-playerdata = f"http://{server_ip}:{port}/players.json" # YOU DON'T NEED TO TOUCH THIS.
-serverdata = f"http://{server_ip}:{port}/info.json" # YOU DON'T NEED TO TOUCH THIS.
+playerdata = f"http://{server_ip}:{port}/players.json" # DON'T TOUCH THIS.
+serverdata = f"http://{server_ip}:{port}/info.json" # DON'T TOUCH THIS.
 
 # Assigning the channel for sending log messages.
 channelid = 1085985260325584967
