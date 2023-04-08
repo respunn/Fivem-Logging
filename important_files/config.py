@@ -9,6 +9,17 @@ channelid = 123456789123456789
 
 # Separated player identifiers and their associated names
 separated = {
-    "steam:123456789123456": "Separated Player 1",
-    "steam:123456789123456": "Separated Player 2"
+    "123456789123456789": "Separated Player 1",
+    "123456789123456789": "Separated Player 2"
+}
+
+admins = {
+    "123456789123456789",
+    "123456789123456789"
+}
+
+
+potential_pd = {
+    "123456789123456789",
+    "123456789123456789"
 }
