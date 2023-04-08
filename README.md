@@ -2,7 +2,7 @@
 
 !!! I didn't test it, there is a chance that this code won't work.
 
-This is a Python script that uses the `discord.py` and `requests` libraries to create a Discord bot that can log the player count and server resources in a game server. Bot getting datas from json files from server, if they are hidden you can't log anything from this bot. The bot is also designed to facilitate races between users within a Discord server, and includes a variety of features such as race standings, character name assignments, and a command to clear messages in a channel.
+This is a Python script that uses the `discord.py` and `requests` libraries to create a Discord bot that can log the player count, player list, who joined or left and server resources in a game server. Bot getting datas from json files from server, if they are hidden you can't log anything from this bot. The bot is also designed to facilitate races between users within a Discord server, and includes a variety of features such as race standings, character name assignments, and a command to clear messages in a channel.
 
 ## Prerequisites
 
