@@ -41,7 +41,7 @@ class log_commands(commands.Cog):
                 print(e) # Printing error.
             
             # Reset the old and new lists at the start of each iteration of the loop
-            old_list = self.old_list_from_outside.copy()
+            old_list = self.old_list_from_outside
             new_list = []
             
             # If connection fails and 60 seconds have elapsed since last error message
@@ -82,26 +82,26 @@ class log_commands(commands.Cog):
                             new_list.append(f"{player['name']} (ᴘᴏᴛᴇɴᴛɪᴀʟ ᴘᴅ)")
                         else:
                             new_list.append(player['name'])
-                
-                # Compare lists and assigning to new lists.
-                old_set = set(old_list)
-                new_set = set(new_list)
-                deleted_players = old_set - new_set
-                added_players = new_set - old_set
-                
-                # Adding data to embed.
-                for player in deleted_players:
-                    embed=discord.Embed(color=discord.Color.from_rgb(255,0,0))
-                    embed.add_field(name=f"{player} left the server.", value=f"<t:{ts}:F>", inline=False)
-                    await channel.send(embed=embed)
-                
-                for player in added_players:
-                    embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
-                    embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
-                    await channel.send(embed=embed)
-                
-                # After adding datas to embed, assign the new list to the old list.
-                self.old_list_from_outside = new_list.copy()
+                    
+                    # Compare lists and assigning to new lists.
+                    old_set = set(old_list)
+                    new_set = set(new_list)
+                    deleted_players = old_set - new_set
+                    added_players = new_set - old_set
+                    
+                    # Adding data to embed.
+                    for player in deleted_players:
+                        embed=discord.Embed(color=discord.Color.from_rgb(255,0,0))
+                        embed.add_field(name=f"{player} left the server.", value=f"<t:{ts}:F>", inline=False)
+                        await channel.send(embed=embed)
+                    
+                    for player in added_players:
+                        embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
+                        embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
+                        await channel.send(embed=embed)
+                    
+                    # After adding datas to embed, assign the new list to the old list.
+                self.old_list_from_outside = new_list
     
     @logging_players.before_loop
     async def before_logging_players(self):
@@ -193,57 +193,54 @@ class log_commands(commands.Cog):
         added_scripts_string = ""
         deleted_scripts_string = ""
         
+        # Attempt to connect to a json file
         try:
-            # Attempt to connect to a json file
-            try:
-                response = requests.get(serverdata).json()
-                # If the JSON file can be accessed, return the data.
-            except requests.exceptions.RequestException as e:
-                print(e) # Printing error.
-            
-            # You can save resources to txt file to check another time or even after restart the bot.
-            with open('resourceslog.txt', 'r') as file:
-                for line in file.readlines():
-                    check_script_list.append(line.strip())
-            for resource in response['resources']:
-                    script_list.append(resource)
-                    script_list.sort()
-                    counter += 1
-            script_list.sort()
-            
-            # Compare lists and assigning to new lists.
-            deleted_scripts = list(set(check_script_list) - set(script_list))
-            added_scripts = list(set(script_list) - set(check_script_list))
-            
-            # Assigning data to strings.
-            if len(added_scripts) != 0:
-                i = 0
-                while i < len(added_scripts):
-                    added_scripts_string += f"{added_scripts[i]}\n"
-                    i += 1
-            if len(deleted_scripts) != 0:
-                i = 0
-                while i < len(deleted_scripts):
-                    deleted_scripts_string += f"{deleted_scripts[i]}\n"
-                    i += 1
-
-            # If there is deleted or added script, we first clean the txt file and then save the new data.
-            if len(added_scripts) != 0 or len(deleted_scripts) != 0:
-                open("resourceslog.txt", "w").close()
-                file = open("resourceslog.txt", "w")
-                i = 0
-                while i < len(script_list):
-                    file.write(f"{script_list[i]}\n")
-                    i += 1
-                file.close()
-                
-                #Sending message to discord.
-                await ctx.send(f"Added script(s):\n{added_scripts_string}\nDeleted script(s):\n{deleted_scripts_string}\nTotal number of script(s): {len(script_list)}")
-            else:
-                await ctx.send(f"There are no scripts added or deleted.\nTotal number of script(s): {len(check_script_list)}")
-                
+            response = requests.get(serverdata).json()
+            # If the JSON file can be accessed, return the data.
         except requests.exceptions.RequestException as e:
             print(e) # Printing error.
+        
+        # You can save resources to txt file to check another time or even after restart the bot.
+        with open('resourceslog.txt', 'r') as file:
+            for line in file.readlines():
+                check_script_list.append(line.strip())
+        for resource in response['resources']:
+                script_list.append(resource)
+                script_list.sort()
+                counter += 1
+        script_list.sort()
+        
+        # Compare lists and assigning to new lists.
+        deleted_scripts = list(set(check_script_list) - set(script_list))
+        added_scripts = list(set(script_list) - set(check_script_list))
+        
+        # Assigning data to strings.
+        if len(added_scripts) != 0:
+            i = 0
+            while i < len(added_scripts):
+                added_scripts_string += f"{added_scripts[i]}\n"
+                i += 1
+        if len(deleted_scripts) != 0:
+            i = 0
+            while i < len(deleted_scripts):
+                deleted_scripts_string += f"{deleted_scripts[i]}\n"
+                i += 1
+
+        # If there is deleted or added script, we first clean the txt file and then save the new data.
+        if len(added_scripts) != 0 or len(deleted_scripts) != 0:
+            open("resourceslog.txt", "w").close()
+            file = open("resourceslog.txt", "a+")
+            i = 0
+            while i < len(script_list):
+                file.write(f"{script_list[i]}\n")
+                i += 1
+            file.close()
+            
+            #Sending message to discord.
+            await ctx.send(f"Added script(s):\n{added_scripts_string}\nDeleted script(s):\n{deleted_scripts_string}\nTotal number of script(s): {len(script_list)}")
+        else:
+            await ctx.send(f"There are no scripts added or deleted.\nTotal number of script(s): {len(check_script_list)}")
+            
 
 def setup(bot):
     bot.add_cog(log_commands(bot))
