@@ -34,7 +34,7 @@ Once the bot is running, you can use the following commands in your Discord serv
 - `!scriptlist`: This command will display a list of resources running on your game server, along with any new resources that have been added or deleted since the last time the command was used. The list is saved to a text file for future reference.
 - `!startlog`: It does what it says. (You don't need to write this command when you activate the bot, bot will start log automatically.)
 - `!stoplog`: It does what it says.
-## Race
+## Race (Work in Progress)
 
 The `route` parameter determines which race is being run, and `number_of_racers` and `entrance_fee` are used to calculate the total winnings. The top three players are passed as `discord.Member` objects to the command, and their winnings are calculated and displayed in the output message. Also you can set character names to discord mentions.
 
