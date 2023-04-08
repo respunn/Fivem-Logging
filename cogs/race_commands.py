@@ -22,7 +22,7 @@ class race_commands(commands.Cog):
         return
     
     #Checking counter from discord.
-    def checkCounter():
+    def checkCounter(self, interaction: discord.Interaction):
         file = open('counter.txt', 'r')
         counter = file.readline()
         counter2 = int(counter)
@@ -30,7 +30,7 @@ class race_commands(commands.Cog):
         return counter2
 
     #It does what it writes.
-    @commands.tree.command(name='checkcounter', description="Checking the counter.")
+    @app_commands.command(name='checkcounter', description="Checking the counter.")
     @app_commands.checks.has_permissions(administrator=True)
     async def checkcounter(interaction: discord.Interaction):
         try:
@@ -40,7 +40,7 @@ class race_commands(commands.Cog):
             await interaction.response.send_message(f"Command failed.", ephemeral=True)
     
     #It does what it writes.
-    @commands.tree.command(name='changecounter', description="Changing the counter.")
+    @app_commands.command(name='changecounter', description="Changing the counter.")
     @app_commands.checks.has_permissions(administrator=True)
     async def changecounter(interaction: discord.Interaction, new_counter: int):
         try:
@@ -50,7 +50,7 @@ class race_commands(commands.Cog):
             await interaction.response.send_message(f"Changing the counter failed.", ephemeral=True)
 
     #Race command.
-    @commands.tree.command(name='race', description="Race standings.")
+    @app_commands.command(name='race', description="Race standings.")
     @app_commands.choices(route = [
         #You can add more race routes here, just copy paste it.
         discord.app_commands.Choice(name='Race 1', value='Race 1'),

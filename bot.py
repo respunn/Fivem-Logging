@@ -10,7 +10,7 @@ TOKEN = os.getenv("TOKEN")
 
 # Import the cogs
 from cogs.log_commands import log_commands
-# from cogs.race_commands import race_commands
+#from cogs.race_commands import race_commands
 
 async def setup():
     # Assigning bot.
@@ -19,7 +19,7 @@ async def setup():
 
     # Add the cogs to the bot (await the add_cog() method calls)
     await bot.add_cog(log_commands(bot))
-    # await bot.add_cog(race_commands(bot))
+    #await bot.add_cog(race_commands(bot))
 
     # To get a reaction and enter details when the bot is ready.
     @bot.event

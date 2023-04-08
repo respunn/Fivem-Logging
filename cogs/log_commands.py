@@ -99,8 +99,8 @@ class log_commands(commands.Cog):
                         embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
                         embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
                         await channel.send(embed=embed)
-                    
-                    # After adding datas to embed, assign the new list to the old list.
+                
+                # After adding datas to embed, assign the new list to the old list.
                 self.old_list_from_outside = new_list
     
     @logging_players.before_loop
