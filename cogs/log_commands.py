@@ -225,7 +225,7 @@ class log_commands(commands.Cog):
                     deleted_scripts_string += f"{deleted_scripts[i]}\n"
                     i += 1
 
-            # If there is no deleted or added script, we first clean the txt file and then save the new data.
+            # If there is deleted or added script, we first clean the txt file and then save the new data.
             if len(added_scripts) != 0 or len(deleted_scripts) != 0:
                 open("resourceslog.txt", "w").close()
                 file = open("resourceslog.txt", "w")
