@@ -61,7 +61,7 @@ class log_commands(commands.Cog):
                             if identifier.startswith('discord:'):
                                 discord_id = identifier[8:]
                         if discord_id == separated:
-                            new_list.append(f"{player['name']} (ꜱᴇᴘᴀʀᴀᴛᴇᴅ)")
+                            new_list.append(f"{separated[discord_id]} (ꜱᴇᴘᴀʀᴀᴛᴇᴅ)")
                         elif discord_id == admins:
                             new_list.append(f"{player['name']} (ᴀᴅᴍɪɴ)")
                         elif discord_id == potential_pd:
@@ -75,7 +75,7 @@ class log_commands(commands.Cog):
                             if identifier.startswith('discord:'):
                                 discord_id = identifier[8:]
                         if discord_id == separated:
-                            new_list.append(f"{player['name']} (ꜱᴇᴘᴀʀᴀᴛᴇᴅ)")
+                            new_list.append(f"{separated[discord_id]} (ꜱᴇᴘᴀʀᴀᴛᴇᴅ)")
                         elif discord_id == admins:
                             new_list.append(f"{player['name']} (ᴀᴅᴍɪɴ)")
                         elif discord_id == potential_pd:
@@ -163,7 +163,9 @@ class log_commands(commands.Cog):
                 if identifier.startswith('discord:'):
                     discord_id = identifier[8:]
             
-            if discord_id in admins:
+            if discord_id in separated:
+                embed.add_field(name=f"{separated[discord_id]} - #{player['id']}", value=f"<@{discord_id}>\nᴀᴅᴍɪɴ", inline=True)
+            elif discord_id in admins:
                 embed.add_field(name=f"{player['name']} - #{player['id']}", value=f"<@{discord_id}>\nᴀᴅᴍɪɴ", inline=True)
                 admincount += 1
             elif discord_id in potential_pd:
