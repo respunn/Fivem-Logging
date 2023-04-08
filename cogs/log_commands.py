@@ -3,8 +3,6 @@ from important_files.imports import *
 
 # Importing config values from separate file
 from important_files.config import *
-# If you want to check is there any admins, you can use their discord id with it.
-from players.log_admin_ids import *
 
 class log_commands(commands.Cog):
     def __init__(self, bot):

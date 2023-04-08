@@ -21,7 +21,7 @@ Before you can use this bot, you need to make sure you have the following:
 `TOKEN = 'your_discord_bot_token'`
 
 5. Open the config file and update the `server_ip` and `port` variables with the IP address and port number of your game server.
-6. You can add admin's discord ids to players/log_admin_ids file.
+6. You can add specific player's discord ids for separate them to admin, potential pd or special separated players..
 7. In your Discord server, create a new bot application and invite it to your server with the appropriate permissions.
 8. Start the bot by running the script in your terminal: `python bot.py`.
 
@@ -31,7 +31,7 @@ Once the bot is running, you can use the following commands in your Discord serv
 
 - **Logging:** It will start logging immediately after running the bot, you can change which channel bot need to send messages to from config file. 
 - `!playerlist`: This command will display a list of players in your game server, along with their Discord mentions and in-game IDs. You can also use this command to check the number of admins and potential PD (police department) players on the server.
-- `!scriptlist`: This command will display a list of resources running on your game server, along with any new resources that have been added or deleted since the last time the command was used. The list is saved to a text file for future reference.
+- `!scriptlist`: (Broken now, i will fix it soon.) This command will display a list of resources running on your game server, along with any new resources that have been added or deleted since the last time the command was used. The list is saved to a text file for future reference.
 - `!startlog`: It does what it says. (You don't need to write this command when you activate the bot, bot will start log automatically.)
 - `!stoplog`: It does what it says.
 ## Race (Work in Progress)
