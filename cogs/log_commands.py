@@ -6,15 +6,6 @@ from important_files.config import *
 # If you want to check is there any admins, you can use their discord id with it.
 from players.log_admin_ids import *
 
-def connection():
-        try:
-            response = requests.get(serverurl).json()
-            # If the JSON file can be accessed, return the data.
-            return response
-        except requests.exceptions.RequestException as e:
-            print(e) # Printing error.
-            return
-
 class log_commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -43,7 +34,11 @@ class log_commands(commands.Cog):
             embednotok.add_field(name="Unable to reach JSON file.", value=f"<t:{ts}:F>", inline=False)
             
             # Attempt to connect to a link
-            response = await connection()
+            try:
+                response = requests.get(serverurl).json()
+                # If the JSON file can be accessed, return the data.
+            except requests.exceptions.RequestException as e:
+                print(e) # Printing error.
             
             # Reset the old and new lists at the start of each iteration of the loop
             old_list = self.old_list_from_outside.copy()
@@ -67,10 +62,10 @@ class log_commands(commands.Cog):
                         for identifier in player['identifiers']:
                             if identifier in separated:
                                 # Append the name associated with the identifier to the old_list
-                                old_list.append(separated[identifier])
+                                new_list.append(separated[identifier])
                                 break  # Skip the rest of the identifiers for this player
                             else:
-                                old_list.append(f"{player['name']}")
+                                new_list.append(f"{player['name']}")
                     self.did_it_work_check = False
                 else:
                     # Appending players to new_list.
@@ -101,7 +96,7 @@ class log_commands(commands.Cog):
                         await channel.send(embed=embed)
                     
                     # After adding datas to embed, assign the new list to the old list.
-                    self.old_list_from_outside = new_list.copy()
+                self.old_list_from_outside = new_list.copy()
     
     @logging_players.before_loop
     async def before_logging_players(self):
@@ -110,29 +105,52 @@ class log_commands(commands.Cog):
     @logging_players.after_loop
     async def after_logging_players(self):
         channel = self.bot.get_channel(channelid)
-        embed=discord.Embed(title="", color=discord.Color.from_rgb(255,0,0))
-        embed.set_author(name="The log loop is broken.")
-        await channel.send(embed)
+        if self.is_running == True:
+            embed=discord.Embed(title="", color=discord.Color.from_rgb(255,0,0))
+            embed.set_author(name="The log loop is broken.")
+            await channel.send(embed=embed)
+        else:
+            return
     
     @commands.command()
     async def stoplog(self, ctx):
-        self.is_running = False
-        embed=discord.Embed(title="", color=discord.Color.from_rgb(255,165,0))
-        embed.set_author(name="Logging has been stopped.")
-        await ctx.send(embed)
+        if self.is_running == True:
+            self.is_running = False
+            embed=discord.Embed(title="", color=discord.Color.from_rgb(255,165,0))
+            embed.set_author(name="Logging has been stopped.")
+        else:
+            embed=discord.Embed(title="", color=discord.Color.from_rgb(255,102,102))
+            embed.set_author(name="Logging has already been stopped.")
+        await ctx.send(embed=embed)
+    
+    @commands.command()
+    async def startlog(self, ctx):
+        if self.is_running == False:
+            self.is_running = True
+            embed=discord.Embed(title="", color=discord.Color.from_rgb(255,165,0))
+            embed.set_author(name="Logging has been started.")
+        else:
+            embed=discord.Embed(title="", color=discord.Color.from_rgb(204,255,204))
+            embed.set_author(name="Logging has already been initialized.")
+        await ctx.send(embed=embed)
     
     # !p command that shows how many players there are.
     @commands.command()
-    async def p(ctx):
+    async def p(self, ctx):
         try:
-            # Trying to access json file.
-            response = requests.get(serverurl).json()
+            # Attempt to connect to a link
+            try:
+                response = requests.get(serverurl).json()
+                # If the JSON file can be accessed, return the data.
+            except requests.exceptions.RequestException as e:
+                print(e) # Printing error.
+            
             total_players = len(response)
             
             admincount = 0
             potentialpdcount = 0
             discord_id = None
-            embed=discord.Embed(title="X Server's Playerlist'", color=discord.Color.from_rgb(255,255,255))
+            embed=discord.Embed(title="X Server's Playerlist", color=discord.Color.from_rgb(255,255,255))
             for player in response:
                 # Getting player name.
                 identifier = player['identifiers']
@@ -175,8 +193,12 @@ class log_commands(commands.Cog):
         deleted_scripts_string = ""
         
         try:
-            # Trying to access json file.
-            response = requests.get(serverurl).json()
+            # Attempt to connect to a link
+            try:
+                response = requests.get(serverurl).json()
+                # If the JSON file can be accessed, return the data.
+            except requests.exceptions.RequestException as e:
+                print(e) # Printing error.
             
             # You can save resources to txt file to check another time or even after restart the bot.
             with open('resourceslog.txt', 'r') as file:
