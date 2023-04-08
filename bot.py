@@ -29,13 +29,7 @@ async def setup():
         # Printing bot's details.
         print('Connected to bot: {}'.format(bot.user.name))
         print('Bot ID: {}'.format(bot.user.id))
-        try:
-            # Trying to sync commands.
-            sycned = await bot.tree.sync()
-            print(f'Sycned {len(sycned)} global commands.')
-        except Exception as e:
-            print(e)
-    
+
     await bot.start(TOKEN)
 
 asyncio.run(setup())

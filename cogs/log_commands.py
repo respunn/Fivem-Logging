@@ -14,6 +14,7 @@ class log_commands(commands.Cog):
         self.is_connected = False
         self.old_list_from_outside = []
         self.did_it_work_check = True
+        self.reached_message = True
         self.logging_players.start()
     
     @commands.Cog.listener()
@@ -28,16 +29,17 @@ class log_commands(commands.Cog):
             current_GMT = time.gmtime()
             ts = calendar.timegm(current_GMT)
             
-            embedok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(0,255,0))
+            embedok=discord.Embed(title="Click to go to the file.", url=playerdata ,color=discord.Color.from_rgb(0,255,0))
             embedok.add_field(name="JSON file reached, logging.", value=f"<t:{ts}:F>", inline=False)
-            embednotok=discord.Embed(title="Click to go to the file.", url=serverurl ,color=discord.Color.from_rgb(255,0,0))
+            embednotok=discord.Embed(title="Click to go to the file.", url=playerdata ,color=discord.Color.from_rgb(255,0,0))
             embednotok.add_field(name="Unable to reach JSON file.", value=f"<t:{ts}:F>", inline=False)
             
             # Attempt to connect to a json file
             try:
-                response = requests.get(serverurl).json()
+                response = requests.get(playerdata).json()
                 # If the JSON file can be accessed, return the data.
             except requests.exceptions.RequestException as e:
+                self.is_connected = False
                 print(e) # Printing error.
             
             # Reset the old and new lists at the start of each iteration of the loop
@@ -49,7 +51,6 @@ class log_commands(commands.Cog):
                 # Send error message
                 await channel.send(embed=embednotok)
                 self.last_error_time = time.time() # Update last error time
-                self.is_connected = False
             else:
                 if not self.is_connected:
                     # Send "JSON file reached" message only once when the connection is established
@@ -57,45 +58,51 @@ class log_commands(commands.Cog):
                     await channel.send(embed=embedok)
                 
                 if self.did_it_work_check == True:
-                    # Appending players to old_list first.
                     for player in response:
                         for identifier in player['identifiers']:
-                            if identifier in separated:
-                                # Append the name associated with the identifier to the old_list
-                                new_list.append(separated[identifier])
-                                break  # Skip the rest of the identifiers for this player
-                            else:
-                                new_list.append(f"{player['name']}")
+                            if identifier.startswith('discord:'):
+                                discord_id = identifier[8:]
+                        if discord_id == separated:
+                            new_list.append(f"{player['name']} (ꜱᴇᴘᴀʀᴀᴛᴇᴅ)")
+                        elif discord_id == admins:
+                            new_list.append(f"{player['name']} (ᴀᴅᴍɪɴ)")
+                        elif discord_id == potential_pd:
+                            new_list.append(f"{player['name']} (ᴘᴏᴛᴇɴᴛɪᴀʟ ᴘᴅ)")
+                        else:
+                            new_list.append(player['name'])
                     self.did_it_work_check = False
                 else:
-                    # Appending players to new_list.
                     for player in response:
                         for identifier in player['identifiers']:
-                            if identifier in separated:
-                                # Append the name associated with the identifier to the new_list
-                                new_list.append(separated[identifier])
-                                break  # Skip the rest of the identifiers for this player
-                            else:
-                                new_list.append(f"{player['name']}")
-                    
-                    # Compare lists and assigning to new lists.
-                    old_set = set(old_list)
-                    new_set = set(new_list)
-                    deleted_players = old_set - new_set
-                    added_players = new_set - old_set
-                    
-                    # Adding data to embed.
-                    for player in deleted_players:
-                        embed=discord.Embed(color=discord.Color.from_rgb(255,0,0))
-                        embed.add_field(name=f"{player} left the server.", value=f"<t:{ts}:F>", inline=False)
-                        await channel.send(embed=embed)
-                    
-                    for player in added_players:
-                        embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
-                        embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
-                        await channel.send(embed=embed)
-                    
-                    # After adding datas to embed, assign the new list to the old list.
+                            if identifier.startswith('discord:'):
+                                discord_id = identifier[8:]
+                        if discord_id == separated:
+                            new_list.append(f"{player['name']} (ꜱᴇᴘᴀʀᴀᴛᴇᴅ)")
+                        elif discord_id == admins:
+                            new_list.append(f"{player['name']} (ᴀᴅᴍɪɴ)")
+                        elif discord_id == potential_pd:
+                            new_list.append(f"{player['name']} (ᴘᴏᴛᴇɴᴛɪᴀʟ ᴘᴅ)")
+                        else:
+                            new_list.append(player['name'])
+                
+                # Compare lists and assigning to new lists.
+                old_set = set(old_list)
+                new_set = set(new_list)
+                deleted_players = old_set - new_set
+                added_players = new_set - old_set
+                
+                # Adding data to embed.
+                for player in deleted_players:
+                    embed=discord.Embed(color=discord.Color.from_rgb(255,0,0))
+                    embed.add_field(name=f"{player} left the server.", value=f"<t:{ts}:F>", inline=False)
+                    await channel.send(embed=embed)
+                
+                for player in added_players:
+                    embed=discord.Embed(color=discord.Color.from_rgb(0,255,0))
+                    embed.add_field(name=f"{player} joined the server.", value=f"<t:{ts}:F>", inline=False)
+                    await channel.send(embed=embed)
+                
+                # After adding datas to embed, assign the new list to the old list.
                 self.old_list_from_outside = new_list.copy()
     
     @logging_players.before_loop
@@ -140,7 +147,7 @@ class log_commands(commands.Cog):
         # Attempt to connect to a json file
         try:
             # If the JSON file can be accessed, return the data.
-            response = requests.get(serverurl).json()
+            response = requests.get(playerdata).json()
             # Sorting json data by the "id" key in ascending order.
             response = sorted(response, key=lambda k: k['id'])
         except requests.exceptions.RequestException as e:
@@ -189,7 +196,7 @@ class log_commands(commands.Cog):
         try:
             # Attempt to connect to a json file
             try:
-                response = requests.get(serverurl).json()
+                response = requests.get(serverdata).json()
                 # If the JSON file can be accessed, return the data.
             except requests.exceptions.RequestException as e:
                 print(e) # Printing error.
@@ -218,8 +225,8 @@ class log_commands(commands.Cog):
                 i = 0
                 while i < len(deleted_scripts):
                     deleted_scripts_string += f"{deleted_scripts[i]}\n"
-                    i += 1      
-                    
+                    i += 1
+
             # If there is no deleted or added script, we first clean the txt file and then save the new data.
             if len(added_scripts) != 0 or len(deleted_scripts) != 0:
                 open("resourceslog.txt", "w").close()

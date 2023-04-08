@@ -1,11 +1,12 @@
 
 #You need to add your server ip and port.
-server_ip = "play.server.net"
+server_ip = "134.255.225.3"
 port = "30120"
-serverurl = f"http://{server_ip}:{port}/players.json" #YOU DON'T NEED TO TOUCH THIS.
+playerdata = f"http://{server_ip}:{port}/players.json" # YOU DON'T NEED TO TOUCH THIS.
+serverdata = f"http://{server_ip}:{port}/info.json" # YOU DON'T NEED TO TOUCH THIS.
 
 # Assigning the channel for sending log messages.
-channelid = 123456789123456789
+channelid = 1085985260325584967
 
 # Separated player identifiers and their associated names
 separated = {
