@@ -136,7 +136,7 @@ class log_commands(commands.Cog):
     
     # !p command that shows how many players there are.
     @commands.command()
-    async def p(self, ctx):
+    async def playerlist(self, ctx):
         # Attempt to connect to a json file
         try:
             # If the JSON file can be accessed, return the data.
@@ -178,7 +178,7 @@ class log_commands(commands.Cog):
 
     # You can check the resources with the !s command.
     @commands.command()
-    async def s(self, ctx):
+    async def scriptlist(self, ctx):
         # Assigning variables.
         counter = 0
         script_list = []
