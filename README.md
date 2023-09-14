@@ -1,3 +1,6 @@
+# !!! The project was abandoned !!!
+
+
 # Discord bot for logging player count, server resources and racing commands for a FiveM server
 
 !!! I didn't test it, there is a chance that this code won't work.
